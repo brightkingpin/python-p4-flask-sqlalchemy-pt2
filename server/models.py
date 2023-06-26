@@ -1,11 +1,11 @@
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
 
-metadata = MetaData(naming_convention={
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-})
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pets.db'  # Replace 'your_database.db' with the name of your SQLite database file
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(metadata=metadata)
+db = SQLAlchemy(app)
 
 class Owner(db.Model):
     __tablename__ = 'owners'
@@ -20,7 +20,7 @@ class Owner(db.Model):
 
 class Pet(db.Model):
     __tablename__ = 'pets'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     species = db.Column(db.String)
@@ -29,3 +29,7 @@ class Pet(db.Model):
 
     def __repr__(self):
         return f'<Pet {self.name}, {self.species}>'
+
+if __name__ == '__main__':
+    db.create_all(app=app)
+    app.run()
